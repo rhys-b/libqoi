@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>QOI Reference Documentation</title>
+
+		<style>
+			body {
+				font-family: sans-serif;
+				max-width: 1000px;
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+			table {
+				border-collapse: collapse;
+			}
+
+			th,td {
+				border: 1px solid black;
+				padding: 10px;
+			}
+
+			pre {
+				background: #EEEEEE;
+				padding: 10px;
+				border-radius: 10px;
+			}
+
+			ul {
+				list-style-type: none;
+			}
+
+			h2 {
+				margin-top: 100px;
+			}
+
+			h3 {
+				margin-top: 50px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<h1>QOI Reference Documentation</h1>
+		<p>The QOI format was developed by Dominic Szablewski. Learn more at
+		   <a href="https://qoiformat.org">qoiformat.org</a>.</p>
+
+		<p>All necessary structures and functions are contained in
+		   <code>qoi.h</code>, and are described below.</p>
+
+		<p>Usually, a <a href="#Qoi">Qoi</a> object is created using either
+		   <a href="#qoi_new_from_file">qoi_new_from_file()</a> or
+		   <a href="#qoi_new_from_data">qoi_new_from_data()</a> to create an
+		   object from an already existing file, or from an already existing
+		   image raster. Then, use either <a href="#qoi_save">qoi_save()</a> or
+		   <a href="#qoi_get_raster">qoi_get_raster()</a> to save the image to a
+		   file or get the image's raster. Finally, call <a href="#qoi_free">
+		   qoi_free()</a> to free the image when it is no longer needed.</p>
+
+		<div style="background:#EEEEFF; border-radius:10px; padding:10px;">
+			<b>Contents</b>
+			<ul>
+				<li>Objects
+					<ul>
+						<li><a href="#Qoi">Qoi</a></li>
+					</ul>
+				</li>
+
+				<li>Enumerations
+					<ul>
+						<li><a href="#QoiColorspace">QoiColorspace</a></li>
+						<li><a href="#QoiChannel">QoiChannel</a></li>
+					</ul>
+				</li>
+
+				<li>Constructors
+					<ul>
+						<li><a href="#qoi_new">qoi_new</a></li>
+						<li><a href="#qoi_new_from_data">qoi_new_from_data</a></li>
+						<li><a href="#qoi_new_from_file">qoi_new_from_file</a></li>
+					</ul>
+				</li>
+
+				<li>Functions
+					<ul>
+						<li><a href="#qoi_free">qoi_free</a></li>
+						<li><a href="#qoi_save">qoi_save</a></li>
+						<li><a href="#qoi_get_raster">qoi_get_raster</a></li>
+						<li><a href="#qoi_get_raster_clone">qoi_get_raster_clone</a></li>
+						<li><a href="#qoi_errno">qoi_errno</a></li>
+						<li><a href="#qoi_strerror">qoi_strerror</a></li>
+						<li><a href="#qoi_has_alpha">qoi_has_alpha</a></li>
+						<li><a href="#qoi_get_width">qoi_get_width</a></li>
+						<li><a href="#qoi_get_height">qoi_get_height</a></li>
+						<li><a href="#qoi_get_rowstride">qoi_get_rowstride</a></li>
+				</li>
+			</ul>
+		</div>
+
+		<h2>Objects</h2>
+		
+		<h3 id="Qoi">Qoi</h3>
+		<p>This is the object that all functions in this library work with. Its
+		   fields are all private and it should be interacted with exclusively
+		   through its functions.</p>
+
+		<h2>Enumerations</h2>
+
+		<h3 id="QoiColorspace">QoiColorspace</h3>
+		<p>The QOI format allows for two colorspace modes.</p>
+		<table>
+			<tr><th>Constant</th><th>Description</th></tr>
+			<tr><td>QOI_COLORSPACE_SRGB</td><td>sRGB with linear alpha</td></tr>
+			<tr><td>QOI_COLORSPACE_LINEAR</td><td>All channels linear</td></tr>
+		</table>
+
+		<h3 id="QoiChannel">QoiChannel</h3>
+		<p>The QOI format allows for both RGB and RGBA images.</p>
+		<table>
+			<tr><th>Constant</th><th>Description</th></tr>
+			<tr><td>QOI_CHANNEL_RGB</td><td>Image with no transparency</td></tr>
+			<tr><td>QOI_CHANNEL_RGBA</td><td>Image with transparency</td></tr>
+		</table>
+
+		<h2>Constructors</h2>
+
+		<h3 id="qoi_new">qoi_new</h3>
+		<p>Creates a new <a href="#Qoi">Qoi</a> object with no initial image
+		   data. The raster can retrieved by <a href="#qoi_get_raster">
+		   qoi_get_raster()</a> and written to after the object is
+		   created.</p>
+
+<pre>
+Qoi *qoi_new(uint32_t width,
+             uint32_t height,
+             QoiColorspace colorspace,
+             QoiChannel channels);
+</pre>
+
+		<table>
+			<tr>
+				<th>Parameter</th>
+				<th>Type</th>
+				<th>Description</th>
+			</tr><tr>
+				<td>width</td>
+				<td>uint32_t</td>
+				<td>Image width (in pixels)</td>
+			</tr><tr>
+				<td>height</td>
+				<td>uint32_t</td>
+				<td>Image height (in pixels)</td>
+			</tr><tr>
+				<td>colorspace</td>
+				<td><a href="#QoiColorspace">QoiColorspace</a></td>
+				<td>Image colorspace</td>
+			</tr><tr>
+				<td>channels</td>
+				<td><a href="#QoiChannel">QoiChannel</a></td>
+				<td>Image channels</td>
+			</tr>
+		</table>
+
+		<h4>Return Value</h4>
+		<p>A newly allocated <a href="#Qoi">Qoi</a> object is returned. This
+		   object must be freed using <a href="#qoi_free">qoi_free()</a> when it
+		   is no longer needed. If an error is encountered, then NULL is
+		   returned and <a href="#qoi_errno">qoi_errno()</a> can be
+		   used to find out why.</p>
+
+		<h3 id="qoi_new_from_data">qoi_new_from_data</h3>
+		<p>Creates a new <a href="#Qoi">Qoi</a> object using an image raster
+		   provided by the user.</p>
+
+<pre>
+Qoi *qoi_new_from_data(uint32_t width,
+                       uint32_t height,
+                       QoiColorspace colorspace,
+                       QoiChannel channels,
+                       void *image_buffer,
+                       void (*freeing_function)(void*));
+</pre>
+
+		<table>
+			<tr>
+				<th>Parameter</th>
+				<th>Type</th>
+				<th>Description</th>
+			</tr><tr>
+				<td>width</td>
+				<td>uint32_t</td>
+				<td>Image width (in pixels)</td>
+			</tr><tr>
+				<td>height</td>
+				<td>uint32_t</td>
+				<td>Image height (in pixels)</td>
+			</tr><tr>
+				<td>colorspace</td>
+				<td><a href="#QoiColorspace">QoiColorspace</a></td>
+				<td>Image colorspace</td>
+			</tr><tr>
+				<td>channels</td>
+				<td><a href="#QoiChannel">QoiChannel</a></td>
+				<td>Image channels</td>
+			</tr><tr>
+				<td>image_buffer</td>
+				<td>void*</td>
+				<td>The raster to use for the image. This must contain a
+				    sequence of red, green, blue, and alpha bytes, in that
+				    order. An alpha value should only be present if
+				    <code>channels</code> is <a href="#QoiChannel">
+				    QOI_CHANNEL_RGBA</a>.</td>
+			</tr><tr>
+				<td>freeing_function</td>
+				<td>void (*)(void*)</td>
+				<td>Function used to free the <code>image_buffer</code> when it
+				    is no longer needed. This can be NULL, which should only be
+				    used if the raster should not be freed.</td>
+			</tr>
+		</table>
+
+		<h4>Return Value</h4>
+		<p>A newly allocated <a href="#Qoi">Qoi</a> object is returned. This
+		   object must be freed using <a href="#qoi_free">qoi_free()</a> when it
+		   is no longer needed. If an error is encountered, then NULL is
+		   returned and <a href="#qoi_errno">qoi_errno()</a> can be
+		   used to find out why.</p>
+
+		<h3 id="qoi_new_from_file">qoi_new_from_file</h3>
+		<p>Creates a new <a href="#Qoi">Qoi</a> object using a QOI file.</p>
+
+<pre>
+Qoi *qoi_new_from_file(const char *filepath);
+</pre>
+
+		<table>
+			<tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+			<tr><td>filepath</td><td>char*</td><td>The path to the file to open</td></tr>
+		</table>
+
+		<h4>Return Value</h4>
+		<p>A newly allocated <a href="#Qoi">Qoi</a> object is returned. This
+		   object must be freed using <a href="#qoi_free">qoi_free()</a> when it
+		   is no longer needed. If an error is encountered, then NULL is
+		   returned and <a href="#qoi_errno">qoi_errno()</a> can be
+		   used to find out why.</p>
+
+		<h2>Functions</h2>
+
+		<h3 id="qoi_free">qoi_free</h3>
+		<p>Releases the resources held by a <a href="#Qoi">Qoi</a> object. After
+		   this operation, the object is invalid and cannot be used anymore.</p>
+
+<pre>
+void qoi_free(Qoi *self);
+</pre>
+
+		<table>
+			<tr>
+				<th>Parameter</th>
+				<th>Type</th>
+				<th>Description</th>
+			</tr><tr>
+				<td>self</td>
+				<td>Qoi*</td>
+				<td>The <a href="#Qoi">Qoi</a> to release</td>
+			</tr>
+		</table>
+
+		<h3 id="qoi_save">qoi_save</h3>
+		<p>Saves a <a href="#Qoi">Qoi</a> object to a file.</p>
+
+<pre>
+int qoi_save(const Qoi *self,
+             const char *filepath);
+</pre>
+
+		<table>
+			<tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+			<tr>
+				<td>self</td>
+				<td>Qoi*</td>
+				<td>The <a href="#Qoi">Qoi</a> object to save to a file</td>
+			</tr><tr>
+				<td>filepath</td>
+				<td>char*</td>
+				<td>The file to save the <a href="#Qoi">Qoi</a> object to</td>
+			</tr>
+		</table>
+
+		<h4>Return Value</h4>
+		<p>Returns 0 on success and -1 on error. <a href="#qoi_errno">
+		   qoi_errno()</a> can be used to find out why an error occurs.</p>
+
+		<h3 id="qoi_get_raster">qoi_get_raster</h3>
+		<p>Gets the image raster for this object.</p>
+
+<pre>
+uint8_t *qoi_get_raster(const Qoi *self);
+</pre>
+
+		<table>
+			<tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+			<tr>
+				<td>self</td>
+				<td>Qoi*</td>
+				<td>The object to get the raster of</td>
+			</tr>
+		</table>
+
+		<h4>Return Value</h4>
+		<p>Gets the object's raster. The raster contains a series
+		   of red, green, blue, and sometimes alpha bytes. The alpha byte only
+		   exists if the object's channel is <a href="#QoiChannel">
+		   QOI_CHANNEL_RGBA</a>.</p>
+
+		<h3 id="qoi_get_raster_clone">qoi_get_raster_clone</h3>
+		<p>Gets a copy of the image raster.</p>
+
+<pre>
+uint8_t *qoi_get_raster_clone(const Qoi *self);
+</pre>
+
+		<table>
+			<tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+			<tr>
+				<td>self</td>
+				<td>Qoi*</td>
+				<td>The image to get a copy of the image raster of</td>
+			</tr>
+		</table>
+
+		<h4>Return Value</h4>
+		<p>Gets a copy of the object's raster. The raster contains a series
+		   of red, green, blue, and sometimes alpha bytes. The alpha byte only
+		   exists if the object's channel is <a href="#QoiChannel">
+		   QOI_CHANNEL_RGBA</a>.</p>
+
+		<h3 id="qoi_errno">qoi_errno</h3>
+		<p>Gets the error code if an operation fails.</p>
+
+<pre>
+int qoi_errno();
+</pre>
+
+		<h4>Return Value</h4>
+		<p>The error code of the previous failure. A string for each code can
+		   be obtained from <a href="#qoi_strerror">qoi_strerror()</a>.</p>
+
+		<h3 id="qoi_strerror">qoi_strerror</h3>
+		<p>Gets a string representation of an error code from
+		   <a href="#qoi_errno">qoi_errno()</a>.</p>
+
+<pre>
+const char *qoi_strerror(int error_code);
+</pre>
+
+		<table>
+			<tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+			<tr>
+				<td>error_code</td>
+				<td>int</td>
+				<td>The error code to get the string representation of</td>
+			</tr>
+		</table>
+
+		<h4>Return Value</h4>
+		<p>A string representation of the given error code. The string is
+		   statically allocated and must not be freed.</p>
+	</body>
+
+	<h3 id="qoi_has_alpha">qoi_has_alpha</h3>
+	<p>Gets if the image has an alpha channel.</p>
+
+<pre>
+int qoi_has_alpha(const Qoi *self);
+</pre>
+
+	<table>
+		<tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+		<tr>
+			<td>self</td>
+			<td>Qoi*</td>
+			<td>The image to determine the presence of an alpha channel for</td>
+		</tr>
+	</table>
+
+	<h4>Return Value</h4>
+	<p>1 if the image has an alpha channel, 0 if it does not.</p>
+
+	<h3 id="qoi_get_width">qoi_get_width</h3>
+	<p>Gets the width of an image.</p>
+
+<pre>
+int qoi_get_width(const Qoi *self);
+</pre>
+
+	<table>
+		<tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+		<tr>
+			<td>self</td>
+			<td>Qoi*</td>
+			<td>The image to get the width of</td>
+		</tr>
+	</table>
+
+	<h4>Return Value</h4>
+	<p>The width of the image (in pixels).
+
+	<h3 id="qoi_get_height">qoi_get_height</h3>
+	<p>Gets the height of an image.</p>
+
+<pre>
+int qoi_get_height(const Qoi *self);
+</pre>
+
+	<table>
+		<tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+		<tr>
+			<td>self</td>
+			<td>Qoi*</td>
+			<td>The image to get the height of</td>
+		</tr>
+	</table>
+
+	<h4>Return Value</h4>
+	<p>The height of the image (in pixels).
+
+	<h3 id="qoi_get_rowstride">qoi_get_rowstride</h3>
+	<p>Gets the rowstride of an image.</p>
+
+<pre>
+int qoi_get_rowstride(const Qoi *self);
+</pre>
+
+	<table>
+		<tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+		<tr>
+			<td>self</td>
+			<td>Qoi*</td>
+			<td>The image to get the rowstride of</td>
+		</tr>
+	</table>
+
+	<h4>Return Value</h4>
+	<p>The rowstride of the image, which is the number of bytes between the
+	   start of two subsequent rows in the raster. This will be equal to the
+	   width of the image (in pixels) times 4 or 3, depending on if the image
+	   has an alpha channel or not, respectively.</p>
