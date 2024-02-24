@@ -15,5 +15,10 @@ test: tester.c libqoi.a libqoi.so
 	mkdir qoi_images
 	./test
 
-install: libqoi.so
+install: libqoi.so qoi.h
 	cp libqoi.so /usr/local/lib/libqoi.so
+	cp qoi.h /usr/local/include/qoi.h
+
+uninstall:
+	rm /usr/local/lib/libqoi.so
+	rm /usr/local/include/qoi.h
