@@ -630,13 +630,12 @@ static int encode(
 		if (color_equal(last_color, current_pixel)) {
 			/* Case 1: Use a run of the previous color. */
 			int length = 1;
-			while (color_equal(
-					last_color,
-					create_color(
-						self->data + ((i + length) * self->channels),
-						self->channels))) {
+			while (i + length < pixels &&
+			       color_equal(last_color,
+			                   create_color(self->data + ((i + length) * self->channels),
+			                                self->channels))) {
 
-				length++;
+				++length;
 			}
 
 			/* Write a run-length operation. */
